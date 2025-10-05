@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %} · Convocatorias{% endblock %}
+{% block content %}
+<div class="row g-4">
+
+  <!-- Formulario para agregar (solo admin) -->
+  {% if session.get('is_admin') %}
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h5">Agregar convocatoria</h2>
+        <form method="post" autocomplete="off">
+          <div class="mb-2">
+            <label class="form-label">Nombre del puesto</label>
+            <input class="form-control" name="title" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Empresa</label>
+            <input class="form-control" name="company" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Link de postulación</label>
+            <input class="form-control" name="link" placeholder="https://..." required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Descripción breve</label>
+            <textarea class="form-control" name="description" rows="4" placeholder="Requisitos, funciones clave, beneficios..."></textarea>
+          </div>
+          <button class="btn btn-primary w-100">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Listado -->
+  <div class="col-lg-7">
+    <div class="d-flex align-items-center justify-content-between">
+      <h2 class="h5 mb-0">Convocatorias</h2>
+      <form class="d-flex" method="get">
+        <input class="form-control me-2" type="search" name="q" placeholder="Filtrar por puesto o empresa" value="{{ q }}">
+        <button class="btn btn-outline-secondary">Buscar</button>
+      </form>
+    </div>
+
+    {% if not session.get('is_admin') %}
+    <div class="alert alert-info mt-3">
+      ¿Ya postulaste a alguna oportunidad? Revisa tu historial en
+      <a href="{{ url_for('jobs_history') }}" class="alert-link">Mis postulaciones</a>.
+    </div>
+    {% endif %}
+
+    <div class="mt-3">
+      {% for j in jobs %}
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="pe-2">
+              <h3 class="h6 mb-1">
+                {{ j['title'] }} — <span class="text-muted">{{ j['company'] }}</span>
+              </h3>
+
+              {% if j['description'] %}
+                <p class="mb-2">{{ j['description'] }}</p>
+              {% else %}
+                <p class="mb-2 text-muted">Sin descripción.</p>
+              {% endif %}
+
+              <div class="text-muted small">
+                Publicado {{ j['created_at'] | timeago }}
+              </div>
+            </div>
+
+            <div class="text-nowrap">
+              <a class="btn btn-sm btn-outline-primary me-2"
+                 target="_blank" rel="noopener"
+                 href="{{ j['link'] }}">
+                Postular
+              </a>
+
+              {% if session.get('is_admin') %}
+              <form method="post"
+                    action="{{ url_for('delete_job', job_id=j['id']) }}"
+                    class="d-inline"
+                    onsubmit="return confirm('¿Eliminar esta convocatoria?');">
+                <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% else %}
+        <p class="text-muted">Sin resultados.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %} · Iniciar sesión{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3 text-center">Bienvenido a {{ APP_NAME }}</h1>
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Correo</label>
+            <input type="email" class="form-control" name="email" placeholder="tucorreo@ejemplo.com" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Clave</label>
+            <input type="password" class="form-control" name="password" placeholder="********" required>
+          </div>
+          <button class="btn btn-primary w-100" type="submit">Ingresar</button>
+        </form>
+        <hr class="my-4">
+        <p class="text-center mb-1">¿Aún no tienes cuenta?</p>
+        <div class="d-grid gap-2">
+          <a class="btn btn-outline-secondary" href="{{ url_for('register') }}">Estudiante interesado — Regístrate</a>
+          <a class="btn btn-outline-dark" href="{{ url_for('register_mentor') }}">Únete como mentor</a>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted small mt-3 text-center">Demo: demo@conectajoven.pe / demo123</p>
+  </div>
+</div>
+{% endblock %}

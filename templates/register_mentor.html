@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %} · Únete como mentor{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3 text-center">Únete como mentor</h1>
+        <p class="text-muted small text-center">Completa tu pre-registro. No se solicita clave en esta etapa.</p>
+        <form method="post">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Nombre completo</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Correo</label>
+              <input type="email" class="form-control" name="email" required>
+            </div>
+          </div>
+          <button class="btn btn-primary w-100 mt-3" type="submit">Crear cuenta</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de éxito -->
+<div class="modal fade" id="preregSuccess" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pre-registro exitoso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        Tu pre-registro se ha hecho con éxito. El equipo de Conecta se comunicará contigo en la brevedad para la activación de tu cuenta.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if success %}
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+  var myModal = new bootstrap.Modal(document.getElementById('preregSuccess'));
+  myModal.show();
+});
+</script>
+{% endif %}
+{% endblock %}

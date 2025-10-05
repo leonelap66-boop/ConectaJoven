@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block title %} · Inicio{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <!-- Columna principal -->
+  <div class="col-lg-8">
+
+    <!-- NOVEDADES -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Novedades</h2>
+        <ul class="list-group list-group-flush">
+          {% for n in novedades %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ n.titulo }}</span>
+            <a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ n.url }}">Ver</a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- TARJETA con CTA "Lo quiero" -->
+    <div class="card card-cta shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between flex-wrap">
+          <div class="me-3">
+            <h3 class="h5 mb-1">Mejora tus opciones con el plan <strong>Mejora Pronto</strong></h3>
+            <p class="mb-0">
+              Por solo <strong>S/ 5</strong>/mes accede a: más ofertas priorizadas, asesoría 24/7 con mentores,
+              revisión de CV, alertas SMS y simuladores premium.
+            </p>
+          </div>
+          <button class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#modalFlyer">
+            Lo quiero
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Columna lateral -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h6">Enlaces de empleo</h2>
+        <div class="list-group">
+          {% for e in enlaces %}
+            <a class="list-group-item list-group-item-action" target="_blank" href="{{ e.url }}">{{ e.nombre }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: FLYER con 2 botones -->
+<div class="modal fade" id="modalFlyer" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0">
+      <div class="modal-body p-0">
+        <!-- Flyer -->
+        <img src="{{ url_for('static', filename='flyer_mejora_pronto.png') }}"
+             alt="Mejora Pronto" style="width:100%; display:block;">
+        <!-- Botonera -->
+        <div class="p-3 d-flex justify-content-end gap-2 bg-light border-top">
+          <button id="btnFlyerNo" type="button" class="btn btn-outline-secondary">
+            No por el momento
+          </button>
+          <button id="btnFlyerSi" type="button" class="btn btn-success">
+            Deseo suscribirme
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST: Notificación de suscripción -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+  <div id="toastSuscrito" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        ¡Listo! Te has suscrito correctamente a <strong>Mejora Pronto</strong>. ¡Disfruta de las novedades! 🎉
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<!-- JS de interacción -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const modalEl = document.getElementById("modalFlyer");
+  const toastEl = document.getElementById("toastSuscrito");
+  const btnSi   = document.getElementById("btnFlyerSi");
+  const btnNo   = document.getElementById("btnFlyerNo");
+
+  const flyerModal = () => bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+
+  // Deseo suscribirme -> cerrar modal y mostrar toast
+  btnSi.addEventListener("click", function () {
+    flyerModal().hide();
+    const t = new bootstrap.Toast(toastEl, { delay: 3500 });
+    t.show();
+    // (Opcional) recordar que se suscribió:
+    // localStorage.setItem("mejoraPronto_sub", "1");
+  });
+
+  // No por el momento -> cerrar modal y volver a Inicio
+  btnNo.addEventListener("click", function () {
+    flyerModal().hide();
+    window.location.href = "{{ url_for('home') }}";
+  });
+});
+</script>
+
+{% endblock %}

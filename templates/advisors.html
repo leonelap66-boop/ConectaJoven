@@ -1,0 +1,167 @@
+
+
+
+{% extends 'base.html' %}
+{% block title %} · Asesorías{% endblock %}
+{% block content %}
+
+<h1 class="h4 mb-3">Agenda una asesoría</h1>
+
+<div class="row g-4">
+  <!-- Columna izquierda: agendar + consulta -->
+  <div class="col-lg-5">
+    <!-- Card: Agendar -->
+    <div class="card shadow-sm mb-3">
+      <div class="card-body">
+        <h2 class="h5">Agendar asesoría</h2>
+        <form method="post" class="mt-3">
+          <input type="hidden" name="action" value="schedule">
+          <div class="mb-2">
+            <label class="form-label">DNI</label>
+            <input class="form-control" name="dni" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Nombres y apellidos</label>
+            <input class="form-control" name="name" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Selecciona un asesor</label>
+            <select class="form-select" name="advisor" required>
+              <option value="" selected>— Elige —</option>
+              {% for a in asesores %}
+                <option value="{{ a['nombre'] }}">{{ a['nombre'] }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-2">
+              <label class="form-label">Fecha</label>
+              <input type="date" class="form-control" name="date" required>
+            </div>
+            <div class="col-6 mb-2">
+              <label class="form-label">Hora</label>
+              <input type="time" class="form-control" name="time" required>
+            </div>
+          </div>
+          <button class="btn btn-primary w-100 mt-2">Agendar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Card: Consultar por DNI -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h6">Consultar mi cita por DNI</h2>
+        <form method="post" class="mt-2 d-flex gap-2">
+          <input type="hidden" name="action" value="lookup">
+          <input class="form-control" name="dni_lookup" placeholder="Ingresa tu DNI">
+          <button class="btn btn-outline-primary">Consultar</button>
+        </form>
+
+        {% if lookup_result %}
+        <div class="alert alert-info mt-3 mb-0">
+          <div><strong>Asesor:</strong> {{ lookup_result['advisor'] }}</div>
+          <div><strong>Fecha:</strong> {{ lookup_result['date'] }}</div>
+          <div><strong>Hora:</strong> {{ lookup_result['time'] }}</div>
+          <div class="mt-2">
+            <a class="btn btn-sm btn-primary" href="{{ MEET_LINK }}" target="_blank">Ir a Google Meet</a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna derecha: asesores -->
+  <div class="col-lg-7">
+    <div class="row g-3">
+      {% for a in asesores %}
+      <div class="col-sm-6">
+        <div class="card shadow-lg border-0 h-100">
+          <div class="card-body text-center">
+            <img src="{{ a['foto'] }}" class="rounded-full rounded-circle mb-3" width="86" height="86" alt="Asesor">
+            <h5 class="card-title mb-1">{{ a['nombre'] }}</h5>
+            <p class="mb-2">
+              {% for q in a['cualidades'] %}
+                <span class="badge bg-success me-1">{{ q }}</span>
+              {% endfor %}
+            </p>
+            <ul class="list-unstyled text-muted small mb-3">
+              {% for s in a['slots'] %}
+                <li>🕑 {{ s }}</li>
+              {% endfor %}
+            </ul>
+            <a href="{{ MEET_LINK }}" class="btn btn-primary" target="_blank">Unirme por Google Meet</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Solo ADMIN: listado de agendamientos -->
+    {% if is_admin and appointments %}
+    <div class="card shadow-sm mt-4">
+      <div class="card-body">
+        <h2 class="h6">Agendamientos recientes (solo admin)</h2>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Asesor</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Creado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in appointments %}
+              <tr>
+                <td>{{ r['id'] }}</td>
+                <td>{{ r['dni'] }}</td>
+                <td>{{ r['name'] }}</td>
+                <td>{{ r['advisor'] }}</td>
+                <td>{{ r['date'] }}</td>
+                <td>{{ r['time'] }}</td>
+                <td class="text-muted small">{{ r['created_at']|timeago }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal de confirmación de agenda -->
+{% if scheduled %}
+<div class="modal fade show" id="confirmModal" tabindex="-1" style="display:block; background:rgba(0,0,0,.5);" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¡Cita registrada!</h5>
+        <a href="{{ url_for('advisors') }}" class="btn-close"></a>
+      </div>
+      <div class="modal-body">
+        <p>Tu asesoría quedó agendada:</p>
+        <ul class="mb-2">
+          <li><strong>Asesor:</strong> {{ scheduled.advisor }}</li>
+          <li><strong>Fecha:</strong> {{ scheduled.date }}</li>
+          <li><strong>Hora:</strong> {{ scheduled.time }}</li>
+        </ul>
+        <p class="mb-0">Guarda el enlace de Meet: <a href="{{ MEET_LINK }}" target="_blank">{{ MEET_LINK }}</a></p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="{{ MEET_LINK }}" target="_blank">Ir a Google Meet</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('advisors') }}">Entendido</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

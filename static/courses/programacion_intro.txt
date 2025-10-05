@@ -1,0 +1,1 @@
+Contenido introductorio de programación: variables, tipos, condicionales y bucles. Ejercicios prácticos incluidos.

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %} · Mis postulaciones{% endblock %}
+{% block content %}
+
+<h1 class="h4 mb-3">Mis postulaciones</h1>
+
+{% if applied_jobs %}
+  <div class="list-group">
+    {% for j in applied_jobs %}
+      <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ j['title'] }} — <span class="text-muted">{{ j['company'] }}</span></h5>
+          <small class="text-muted">Postulaste {{ j['applied_at']|timeago }}</small>
+        </div>
+        {% if j['description'] %}
+          <p class="mb-2 text-muted">{{ j['description'] }}</p>
+        {% endif %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ j['link'] }}" target="_blank" rel="noopener">Ver convocatoria</a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-secondary">Aún no registras postulaciones.</div>
+{% endif %}
+
+<a href="{{ url_for('jobs') }}" class="btn btn-link mt-3">← Volver a Convocatorias</a>
+{% endblock %}
